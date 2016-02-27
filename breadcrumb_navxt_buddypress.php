@@ -68,6 +68,10 @@ function bcn_bp_filler($breadcrumb_trail)
 		{
 			$breadcrumb_trail->breadcrumbs[0]->set_url(bp_get_group_permalink(groups_get_current_group()));
 		}
+		if(!bp_is_group_home())
+		{
+			bcn_bp_do_group($breadcrumb_trail);
+		}
 	}
 	//Need to add a type for members directory pages, possibly a link too
 	else if(bp_is_members_directory())
@@ -145,6 +149,26 @@ function bcn_bp_do_user(&$breadcrumb_trail)
 					$url = trailingslashit(bp_displayed_user_domain() . $user_nav_item['link']);
 				}
 				$breadcrumb->set_url($url);
+			}
+			array_unshift($breadcrumb_trail->breadcrumbs, $breadcrumb);
+			return;
+		}
+	}
+}
+function bcn_bp_do_group(&$breadcrumb_trail)
+{
+	$bp = buddypress();
+	$index = bp_current_item();
+	//Loop around the nav items until we find the one we are on
+	foreach((array) $bp->bp_options_nav[$index] as $nav_item)
+	{
+		if(bp_current_action() === $nav_item['slug'])
+		{
+			//Now add the breadcrumb
+			$breadcrumb = new bcn_breadcrumb($nav_item['name'], null, array('group', 'group-' . $nav_item['slug'], 'current-item'));
+			if($breadcrumb_trail->opt['bcurrent_item_linked'])
+			{
+				$breadcrumb->set_url($nav_item['link']);
 			}
 			array_unshift($breadcrumb_trail->breadcrumbs, $breadcrumb);
 			return;
