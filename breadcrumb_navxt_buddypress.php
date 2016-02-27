@@ -184,5 +184,5 @@ function bcn_bp_do_group(&$breadcrumb_trail)
  */
 function bcn_bp_clean_name($string)
 {
-	return preg_replace('/\<span.*\>\d*\<\/span\>/', '', $string);
+	return trim(preg_replace('/\<span.*\>\d*\<\/span\>/', '', $string));
 }
