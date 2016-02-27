@@ -27,6 +27,11 @@ DomainPath: /languages/
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 require_once(dirname(__FILE__) . '/includes/block_direct_access.php');
+add_action('plugins_loaded', 'bcn_bp_load_plugin_textdomain');
+function bcn_bp_load_plugin_textdomain()
+{
+	load_plugin_textdomain('breadcrumb-navxt-buddypress', FALSE, basename(dirname(__FILE__)) . '/languages/');
+}
 add_action('bcn_after_fill', 'bcn_bp_filler', 11);
 /**
  * Hooks into the bcn_after_fill action and deals with filling the BuddyPress items
@@ -102,17 +107,17 @@ function bcn_bp_remove_current_item(&$breadcrumb_trail)
 }
 function bcn_bp_do_members_directory(&$breadcrumb_trail)
 {
-	$breadcrumb = new bcn_breadcrumb(_x('Members', 'Page title for the Members directory.'), null, array('members', 'members-directory'), bp_get_members_directory_permalink());
+	$breadcrumb = new bcn_breadcrumb(_x('Members', 'Page title for the Members directory.', 'breadcrumb-navxt-buddypress'), null, array('members', 'members-directory'), bp_get_members_directory_permalink());
 	array_splice($breadcrumb_trail->breadcrumbs, 1, 0, array($breadcrumb));
 }
 function bcn_bp_do_groups_directory(&$breadcrumb_trail)
 {
-	$breadcrumb = new bcn_breadcrumb(_x('Groups', 'Page title for the Groups directory.'), null, array('groups', 'groups-directory'), bp_get_groups_directory_permalink());
+	$breadcrumb = new bcn_breadcrumb(_x('Groups', 'Page title for the Groups directory.', 'breadcrumb-navxt-buddypress'), null, array('groups', 'groups-directory'), bp_get_groups_directory_permalink());
 	array_splice($breadcrumb_trail->breadcrumbs, 1, 0, array($breadcrumb));
 }
 function bcn_bp_do_group_create(&$breadcrumb_trail)
 {
-	$breadcrumb = new bcn_breadcrumb(__('Create a Group'), null, array('groups', 'create-new-group', 'current-item'));
+	$breadcrumb = new bcn_breadcrumb(__('Create a Group', 'breadcrumb-navxt-buddypress'), null, array('groups', 'create-new-group', 'current-item'));
 	if($breadcrumb_trail->opt['bcurrent_item_linked'])
 	{
 		$breadcrumb->set_url(bp_get_root_domain() . '/' . bp_get_groups_root_slug() . '/create');
