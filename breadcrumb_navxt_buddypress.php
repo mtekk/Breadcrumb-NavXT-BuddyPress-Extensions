@@ -137,7 +137,7 @@ function bcn_bp_do_user(&$breadcrumb_trail)
 		if(bp_is_current_component($user_nav_item['slug']))
 		{
 			//Now add the breadcrumb
-			$breadcrumb = new bcn_breadcrumb($user_nav_item['name'], null, array('member', 'member-' . $user_nav_item['slug'], 'current-item'));
+			$breadcrumb = new bcn_breadcrumb(bcn_bp_clean_name($user_nav_item['name']), null, array('member', 'member-' . $user_nav_item['slug'], 'current-item'));
 			if($breadcrumb_trail->opt['bcurrent_item_linked'])
 			{
 				if(bp_loggedin_user_domain())
@@ -165,7 +165,7 @@ function bcn_bp_do_group(&$breadcrumb_trail)
 		if(bp_current_action() === $nav_item['slug'])
 		{
 			//Now add the breadcrumb
-			$breadcrumb = new bcn_breadcrumb($nav_item['name'], null, array('group', 'group-' . $nav_item['slug'], 'current-item'));
+			$breadcrumb = new bcn_breadcrumb(bcn_bp_clean_name($nav_item['name']), null, array('group', 'group-' . $nav_item['slug'], 'current-item'));
 			if($breadcrumb_trail->opt['bcurrent_item_linked'])
 			{
 				$breadcrumb->set_url($nav_item['link']);
@@ -174,4 +174,15 @@ function bcn_bp_do_group(&$breadcrumb_trail)
 			return;
 		}
 	}
+}
+/**
+ * Removes the annoying number and span from nav item names in BuddyPress
+ * 
+ * @param string $string The name to remove the span/digit from
+ * 
+ * @return string The name sans span and digit(s)
+ */
+function bcn_bp_clean_name($string)
+{
+	return preg_replace('/\<span.*\>\d*\<\/span\>/', '', $string);
 }
