@@ -3,7 +3,7 @@
 Plugin Name: Breadcrumb NavXT BuddyPress Extensions
 Plugin URI: https://mtekk.us/extensions/breadcrumb-navxt-buddypress-extensions
 Description: Fixes a few edge cases that BuddyPress presents. For details on how to use this plugin visit <a href="https://mtekk.us/extensions/breadcrumb-navxt-buddypress-extensions">Breadcrumb NavXT BuddyPress Extensions</a>. 
-Version: 1.0.0
+Version: 0.1.0
 Author: John Havlik
 Author URI: http://mtekk.us/
 License: GPL2
