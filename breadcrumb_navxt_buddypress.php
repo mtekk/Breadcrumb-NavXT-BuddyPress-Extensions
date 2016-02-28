@@ -50,15 +50,15 @@ function bcn_bp_filler($breadcrumb_trail)
 	{
 		//Start by adding in the directory link (so that we have a known good position)
 		bcn_bp_do_members_directory($breadcrumb_trail);
-		if(!bp_is_user_activity())
-		{
-			bcn_bp_remove_current_item($breadcrumb_trail);
-		}
 		if($breadcrumb_trail->opt['bcurrent_item_linked'] || !bp_is_user_activity())
 		{
 			$breadcrumb_trail->breadcrumbs[0]->set_url(bp_displayed_user_domain());
 		}
-		bcn_bp_do_user($breadcrumb_trail);
+		if(!bp_is_user_activity())
+		{
+			bcn_bp_remove_current_item($breadcrumb_trail);
+			bcn_bp_do_user($breadcrumb_trail);
+		}
 	}
 	//Handle group pages
 	else if(bp_is_group())
