@@ -49,7 +49,7 @@ function bcn_bp_filler($breadcrumb_trail)
 	if(bp_is_user())
 	{
 		//Start by adding in the directory link (so that we have a known good position)
-		bcn_bp_do_members_directory($breadcrumb_trail);
+		bcn_bp_do_directory($breadcrumb_trail, 'members');
 		if($breadcrumb_trail->opt['bcurrent_item_linked'] || !bp_is_user_activity())
 		{
 			$breadcrumb_trail->breadcrumbs[0]->set_url(bp_displayed_user_domain());
@@ -63,7 +63,7 @@ function bcn_bp_filler($breadcrumb_trail)
 	//Handle group pages
 	else if(bp_is_group())
 	{
-		bcn_bp_do_groups_directory($breadcrumb_trail);
+		bcn_bp_do_directory($breadcrumb_trail, 'groups');
 		if($breadcrumb_trail->opt['bcurrent_item_linked'])
 		{
 			$breadcrumb_trail->breadcrumbs[0]->set_url(bp_get_group_permalink(groups_get_current_group()));
@@ -109,15 +109,38 @@ function bcn_bp_remove_current_item(&$breadcrumb_trail)
 		unset($breadcrumb_trail->breadcrumbs[0]->type[$key]);
 	}
 }
-function bcn_bp_do_members_directory(&$breadcrumb_trail)
+/**
+ * A Breadcrumb Trail injection Function
+ * 
+ * This recursive functions fills the trail with breadcrumbs for parent posts/pages.
+ * @param int $id The id of the parent page.
+ * @param int $frontpage The id of the front page.
+ * @return WP_Post The parent we stopped at
+ */
+function bcn_bp_post_parents(&$breadcrumb_trail, $id, $frontpage, $depth)
 {
-	$breadcrumb = new bcn_breadcrumb(_x('Members', 'Page title for the Members directory.', 'breadcrumb-navxt-buddypress'), null, array('members', 'members-directory'), bp_get_members_directory_permalink());
-	array_splice($breadcrumb_trail->breadcrumbs, 1, 0, array($breadcrumb));
+	//Use WordPress API, though a bit heavier than the old method, this will ensure compatibility with other plug-ins
+	$parent = get_post($id);
+	//Place the breadcrumb in the trail, uses the constructor to set the title, template, and type, get a pointer to it in return
+	$breadcrumb = new bcn_breadcrumb(get_the_title($id), $breadcrumb_trail->opt['Hpost_' . $parent->post_type . '_template'], array('post', 'post-' . $parent->post_type), get_permalink($id), $id);
+	array_splice($breadcrumb_trail->breadcrumbs, $depth, 0, array($breadcrumb));
+	//Make sure the id is valid, and that we won't end up spinning in a loop
+	if($parent->post_parent >= 0 && $parent->post_parent != false && $id != $parent->post_parent && $frontpage != $parent->post_parent)
+	{
+		//If valid, recursively call this function
+		bcn_bp_post_parents($breadcrumb_trail, $parent->post_parent, $frontpage, ++$depth);
+	}
 }
-function bcn_bp_do_groups_directory(&$breadcrumb_trail)
+/**
+ * A quasi generic directory page breadcrumb injection function
+ * 
+ * @param bcn_breadcrumb_trail $breadcrumb_trail The breadcrumb trail object to modify
+ * @param string $resource The name of the BuddyPress resource to generate the directory trail for 
+ */
+function bcn_bp_do_directory(&$breadcrumb_trail, $resource)
 {
-	$breadcrumb = new bcn_breadcrumb(_x('Groups', 'Page title for the Groups directory.', 'breadcrumb-navxt-buddypress'), null, array('groups', 'groups-directory'), bp_get_groups_directory_permalink());
-	array_splice($breadcrumb_trail->breadcrumbs, 1, 0, array($breadcrumb));
+	$directory_pages = bp_core_get_directory_page_ids();
+	bcn_bp_post_parents($breadcrumb_trail, $directory_pages[$resource], get_option('page_on_front'), 1);
 }
 function bcn_bp_do_group_create(&$breadcrumb_trail)
 {
