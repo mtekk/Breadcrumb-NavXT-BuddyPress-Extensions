@@ -3,8 +3,8 @@ Contributors: mtekk
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=FD5XEU783BR8U&lc=US&item_name=Breadcrumb%20NavXT%20Donation&currency_code=USD&bn=PP%2dDonationsBF%3abtn_donateCC_LG%2egif%3aNonHosted
 Tags: breadcrumb navxt, breadcrumb, breadcrumbs, trail, navigation, menu, buddypress
 Requires at least: 4.0
-Tested up to: 4.2
-Stable tag: 1.0.0
+Tested up to: 4.7
+Stable tag: 0.1.1
 License: GPLv2 or later
 Enhances Breadcrumb NavXT's support for BuddyPress.
 
@@ -30,9 +30,17 @@ To customize the breadcrumb trail you may edit the default values for the option
 Please visit [Breadcrumb NavXT's Documentation](http://mtekk.us/code/breadcrumb-navxt/breadcrumb-navxt-doc/ "Go to Breadcrumb NavXT's Documentation.") page for more information.
 
 == Changelog ==
-= 1.0.0 =
+= 0.1.1 =
+Release date: November 17th, 2016
+
+* Bug fix: Fixed compatibility issues with BuddyPress 2.6+
+* Bug fix: Fixed issue where the BuddyPress Directory page's hierarchy was not represented in the breadcrumb trail
+
+= 0.1.0 =
+Release date: March 11th, 2016
+
 * Initial Public Release
 
 == Upgrade Notice ==
-= 1.0.0 =
+= 0.1.0 =
 Initial Public Release
