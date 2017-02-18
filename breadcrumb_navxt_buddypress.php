@@ -3,7 +3,7 @@
 Plugin Name: Breadcrumb NavXT BuddyPress Extensions
 Plugin URI: https://mtekk.us/extensions/breadcrumb-navxt-buddypress-extensions
 Description: Fixes a few edge cases that BuddyPress presents. For details on how to use this plugin visit <a href="https://mtekk.us/extensions/breadcrumb-navxt-buddypress-extensions">Breadcrumb NavXT BuddyPress Extensions</a>. 
-Version: 0.1.1
+Version: 0.1.2
 Author: John Havlik
 Author URI: http://mtekk.us/
 License: GPL2
@@ -181,6 +181,10 @@ function bcn_bp_do_user(&$breadcrumb_trail)
 function bcn_bp_do_group(&$breadcrumb_trail)
 {
 	$bp = buddypress();
+	if(!isset($bp->groups->nav))
+	{
+		return;
+	}
 	//Loop around the nav items until we find the one we are on
 	foreach((array) $bp->groups->nav->get_secondary(array('parent_slug' => bp_current_item(), 'user_has_access' => true)) as $nav_item)
 	{
