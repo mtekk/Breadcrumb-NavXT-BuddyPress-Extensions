@@ -3,14 +3,14 @@
 Plugin Name: Breadcrumb NavXT BuddyPress Extensions
 Plugin URI: https://mtekk.us/extensions/breadcrumb-navxt-buddypress-extensions
 Description: Fixes a few edge cases that BuddyPress presents. For details on how to use this plugin visit <a href="https://mtekk.us/extensions/breadcrumb-navxt-buddypress-extensions">Breadcrumb NavXT BuddyPress Extensions</a>. 
-Version: 0.1.2
+Version: 1.0.2
 Author: John Havlik
 Author URI: http://mtekk.us/
 License: GPL2
 TextDomain: breadcrumb-navxt-buddypress
 DomainPath: /languages/
 */
-/*  Copyright 2014-2016  John Havlik  (email : john.havlik@mtekk.us)
+/*  Copyright 2014-2017  John Havlik  (email : john.havlik@mtekk.us)
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -64,11 +64,11 @@ function bcn_bp_filler($breadcrumb_trail)
 	else if(bp_is_group())
 	{
 		bcn_bp_do_directory($breadcrumb_trail, 'groups');
-		if($breadcrumb_trail->opt['bcurrent_item_linked'])
+		if($breadcrumb_trail->opt['bcurrent_item_linked'] || !(bp_is_group_home()|| bp_is_group_create()))
 		{
 			$breadcrumb_trail->breadcrumbs[0]->set_url(bp_get_group_permalink(groups_get_current_group()));
 		}
-		if(!bp_is_group_home())
+		if(!bp_is_group_home() && !bp_is_group_create())
 		{
 			bcn_bp_do_group($breadcrumb_trail);
 		}
@@ -104,9 +104,9 @@ function bcn_bp_filler($breadcrumb_trail)
  */
 function bcn_bp_remove_current_item(&$breadcrumb_trail)
 {
-	if($key = array_search('current-item', $breadcrumb_trail->breadcrumbs[0]->type))
+	if(method_exists($breadcrumb_trail->breadcrumbs[0], 'remove_types'))
 	{
-		unset($breadcrumb_trail->breadcrumbs[0]->type[$key]);
+		$breadcrumb_trail->breadcrumbs[0]->remove_types(array('current-item'));
 	}
 }
 /**
@@ -154,6 +154,10 @@ function bcn_bp_do_group_create(&$breadcrumb_trail)
 function bcn_bp_do_user(&$breadcrumb_trail)
 {
 	$bp = buddypress();
+	if(!isset($bp->members->nav))
+	{
+		return;
+	}
 	//Loop around the nav items until we find the one we are on
 	foreach((array) $bp->members->nav->get_item_nav() as $user_nav_item)
 	{
