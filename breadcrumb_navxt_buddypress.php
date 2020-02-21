@@ -3,14 +3,14 @@
 Plugin Name: Breadcrumb NavXT BuddyPress Extensions
 Plugin URI: https://mtekk.us/extensions/breadcrumb-navxt-buddypress-extensions
 Description: Fixes a few edge cases that BuddyPress presents. For details on how to use this plugin visit <a href="https://mtekk.us/extensions/breadcrumb-navxt-buddypress-extensions">Breadcrumb NavXT BuddyPress Extensions</a>. 
-Version: 1.0.2
+Version: 1.0.3
 Author: John Havlik
 Author URI: http://mtekk.us/
 License: GPL2
 TextDomain: breadcrumb-navxt-buddypress
 DomainPath: /languages/
 */
-/*  Copyright 2014-2017  John Havlik  (email : john.havlik@mtekk.us)
+/*  Copyright 2014-2020  John Havlik  (email : john.havlik@mtekk.us)
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -122,7 +122,13 @@ function bcn_bp_post_parents(&$breadcrumb_trail, $id, $frontpage, $depth)
 	//Use WordPress API, though a bit heavier than the old method, this will ensure compatibility with other plug-ins
 	$parent = get_post($id);
 	//Place the breadcrumb in the trail, uses the constructor to set the title, template, and type, get a pointer to it in return
-	$breadcrumb = new bcn_breadcrumb(get_the_title($id), $breadcrumb_trail->opt['Hpost_' . $parent->post_type . '_template'], array('post', 'post-' . $parent->post_type), get_permalink($id), $id);
+	$breadcrumb = new bcn_breadcrumb(
+			get_the_title($id),
+			$breadcrumb_trail->opt['Hpost_' . $parent->post_type . '_template'],
+			array('post', 'post-' . $parent->post_type),
+			get_permalink($id),
+			$id,
+			true);
 	array_splice($breadcrumb_trail->breadcrumbs, $depth, 0, array($breadcrumb));
 	//Make sure the id is valid, and that we won't end up spinning in a loop
 	if($parent->post_parent >= 0 && $parent->post_parent != false && $id != $parent->post_parent && $frontpage != $parent->post_parent)
@@ -144,10 +150,14 @@ function bcn_bp_do_directory(&$breadcrumb_trail, $resource)
 }
 function bcn_bp_do_group_create(&$breadcrumb_trail)
 {
-	$breadcrumb = new bcn_breadcrumb(__('Create a Group', 'breadcrumb-navxt-buddypress'), null, array('groups', 'create-new-group', 'current-item'));
+	$breadcrumb = new bcn_breadcrumb(
+			__('Create a Group', 'breadcrumb-navxt-buddypress'),
+			null,
+			array('groups', 'create-new-group', 'current-item'),
+			bp_get_root_domain() . '/' . bp_get_groups_root_slug() . '/create');
 	if($breadcrumb_trail->opt['bcurrent_item_linked'])
 	{
-		$breadcrumb->set_url(bp_get_root_domain() . '/' . bp_get_groups_root_slug() . '/create');
+		$breadcrumb->set_linked(true);
 	}
 	array_unshift($breadcrumb_trail->breadcrumbs, $breadcrumb);
 }
@@ -163,19 +173,23 @@ function bcn_bp_do_user(&$breadcrumb_trail)
 	{
 		if(bp_is_current_component($user_nav_item['slug']))
 		{
+			if(bp_loggedin_user_domain())
+			{
+				$url = str_replace(bp_loggedin_user_domain(), bp_displayed_user_domain(), $user_nav_item['link']);
+			}
+			else
+			{
+				$url = trailingslashit(bp_displayed_user_domain() . $user_nav_item['link']);
+			}
 			//Now add the breadcrumb
-			$breadcrumb = new bcn_breadcrumb(bcn_bp_clean_name($user_nav_item['name']), null, array('member', 'member-' . $user_nav_item['slug'], 'current-item'));
+			$breadcrumb = new bcn_breadcrumb(
+					bcn_bp_clean_name($user_nav_item['name']),
+					null,
+					array('member', 'member-' . $user_nav_item['slug'], 'current-item'),
+					$url);
 			if($breadcrumb_trail->opt['bcurrent_item_linked'])
 			{
-				if(bp_loggedin_user_domain())
-				{
-					$url = str_replace(bp_loggedin_user_domain(), bp_displayed_user_domain(), $user_nav_item['link']);
-				}
-				else
-				{
-					$url = trailingslashit(bp_displayed_user_domain() . $user_nav_item['link']);
-				}
-				$breadcrumb->set_url($url);
+				$breadcrumb->set_linked(true);
 			}
 			array_unshift($breadcrumb_trail->breadcrumbs, $breadcrumb);
 			return;
@@ -195,10 +209,14 @@ function bcn_bp_do_group(&$breadcrumb_trail)
 		if(bp_current_action() === $nav_item['slug'])
 		{
 			//Now add the breadcrumb
-			$breadcrumb = new bcn_breadcrumb(bcn_bp_clean_name($nav_item['name']), null, array('group', 'group-' . $nav_item['slug'], 'current-item'));
+			$breadcrumb = new bcn_breadcrumb(
+					bcn_bp_clean_name($nav_item['name']),
+					null,
+					array('group', 'group-' . $nav_item['slug'], 'current-item'),
+					$nav_item['link']);
 			if($breadcrumb_trail->opt['bcurrent_item_linked'])
 			{
-				$breadcrumb->set_url($nav_item['link']);
+				$breadcrumb->set_linked($true);
 			}
 			array_unshift($breadcrumb_trail->breadcrumbs, $breadcrumb);
 			return;
